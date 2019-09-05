@@ -2,6 +2,8 @@
 
 This package wraps [sqlx](https://github.com/jmoiron/sqlx) and manages a map of named statements.
 
+See [test file](database_test.go) for example usage.
+
 ## Testing
 
 ```sh
