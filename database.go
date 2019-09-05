@@ -142,7 +142,7 @@ func (d *Database) Transact(ctx context.Context, opts *sql.TxOptions, f func(DB)
 	return errors.Wrapf(tx.Commit(), "tx level %v: commit", txLvl)
 }
 
-// Stmt retrieves a named statement.
+// Stmt creates and/or retrieves a named statement.
 func (d *Database) Stmt(query string) (*sqlx.NamedStmt, error) {
 	// Fetch an already-prepared statement.
 	d.stmtsMtx.Lock()
