@@ -34,7 +34,7 @@ type DB interface {
 	Stmt(query string) (*sqlx.NamedStmt, error)
 
 	// TODO: Implement nested transactions.
-	Transact(ctx context.Context, opts *sql.TxOptions, f func(DB) error) error
+	Transact(ctx context.Context, opts sql.TxOptions, f func(DB) error) error
 }
 
 // Database wraps a sqlx.DB and manages NamedStmt's.
@@ -113,14 +113,16 @@ func (d *Database) Select(ctx context.Context, query string, dest, params interf
 
 // Transact will run the function that is passed in, rolling back all SQL
 // statements if an error is returned.
-// Nested transactions are not currently supported and will return an error.
-func (d *Database) Transact(ctx context.Context, opts *sql.TxOptions, f func(DB) error) error {
+// NOTE: A non-nil TxOptions struct is accepted to encourage thoughtful
+// selection of transaction isolation levels.
+// NOTE: Nested transactions are not currently supported and will return an error.
+func (d *Database) Transact(ctx context.Context, opts sql.TxOptions, f func(DB) error) error {
 	if d.tx != nil {
 		// TODO: Support nested tx.
 		return errors.New("nested tx not currently supported")
 	}
 
-	tx, err := d.X.BeginTxx(ctx, opts)
+	tx, err := d.X.BeginTxx(ctx, &opts)
 	if err != nil {
 		return err
 	}

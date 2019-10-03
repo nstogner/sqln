@@ -2,6 +2,7 @@ package sqln
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"testing"
 
@@ -51,7 +52,7 @@ func ExampleUsage() {
 	})
 
 	// Run SignupUser inside a transaction with other stuff.
-	_ = dbn.Transact(ctx, nil, func(db DB) error {
+	_ = dbn.Transact(ctx, sql.TxOptions{Isolation: sql.LevelSerializable}, func(db DB) error {
 		if err := SignupUser(ctx, db, SignupUserRequest{
 			ID:    "nick1234",
 			Email: "nick000@gmail.com",
@@ -93,7 +94,7 @@ func TestDB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := d.Transact(ctx, nil, func(tx DB) error {
+	err := d.Transact(ctx, sql.TxOptions{Isolation: sql.LevelSerializable}, func(tx DB) error {
 		if tx.(*Database).tx == nil {
 			t.Fatal("tx should not be nil")
 		}
